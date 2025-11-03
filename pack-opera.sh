@@ -4,7 +4,7 @@ set -euo pipefail
 # === Ajusta si tu ruta cambia ===
 PROJECT_DIR="/Users/kamedina/WebstormProjects/notas-fluido"
 
-# Detect Opera / Opera GX
+# Detectar Opera / Opera GX
 OPERA_APP=""
 if [ -x "/Applications/Opera.app/Contents/MacOS/Opera" ]; then
   OPERA_APP="/Applications/Opera.app/Contents/MacOS/Opera"
@@ -51,7 +51,7 @@ fi
 
 # ------- Cerrar Opera y limpiar artefactos previos -------
 osascript -e 'tell application "Opera" to quit' >/dev/null 2>&1 || true
-osascript -e 'tell application "Opera GX" to quit' >/dev/null 2>&1 || true
+osascript -e 'tell application "Opera GX" to quit' >/dev/null 2>&1 || true   # <-- corregido /dev/null
 pkill -f "/Applications/Opera.app/Contents/MacOS/Opera"     >/dev/null 2>&1 || true
 pkill -f "/Applications/Opera GX.app/Contents/MacOS/Opera"  >/dev/null 2>&1 || true
 sleep 1
@@ -99,21 +99,37 @@ if [ -z "${KEY_PATH:-}" ] && [ -f "$SRC_PEM" ]; then
   echo "🔑 Clave generada: $CANDIDATE_OUTSIDE (guárdala para mantener el mismo ID)"
 fi
 
-# ------- ZIP para la tienda (no incluyas .pem/.crx, ni dist) -------
-echo "🗜️  Creando ZIP para la tienda…"
+# ------- ZIP para la tienda usando STAGING (whitelist) -------
+echo "🗜️  Creando ZIP para la tienda (whitelist)…"
 OUT_ZIP="$DIST/notas-fluido-$VERSION.zip"
-(
-  cd "$PROJECT_DIR"
-  zip -r -X -9 "$OUT_ZIP" . \
-    -x "dist/*" "*.pem" "*.crx" \
-       ".DS_Store" "__MACOSX/*" \
-       ".git/*" ".idea/*" ".vscode/*" \
-       "node_modules/*" "tests/*" \
-       "pack-opera.sh" \
-       "README*" "screenshot*"
-)
-echo "✅ ZIP: $OUT_ZIP"
+STAGE="$DIST/.store-stage"
+rm -rf "$STAGE"
+mkdir -p "$STAGE/assets"
 
-# Limpieza del perfil temporal
-rm -rf "$TMP_PROFILE" || true
+# Copia SÓLO los archivos permitidos por la tienda
+cp -f "$PROJECT_DIR/manifest.json" "$STAGE/"                           || true
+[ -f "$PROJECT_DIR/popup.html" ]          && cp -f "$PROJECT_DIR/popup.html" "$STAGE/"
+[ -f "$PROJECT_DIR/popup.css" ]           && cp -f "$PROJECT_DIR/popup.css"  "$STAGE/"
+[ -f "$PROJECT_DIR/popup.js" ]            && cp -f "$PROJECT_DIR/popup.js"   "$STAGE/"
+[ -f "$PROJECT_DIR/service_worker.js" ]   && cp -f "$PROJECT_DIR/service_worker.js" "$STAGE/"
+
+# Assets (íconos)
+for f in icon-16.png icon-32.png icon-48.png icon-128.png; do
+  if [ -f "$PROJECT_DIR/assets/$f" ]; then
+    cp -f "$PROJECT_DIR/assets/$f" "$STAGE/assets/"
+  fi
+done
+
+# Elimina ZIP previo si existía
+rm -f "$OUT_ZIP" 2>/dev/null || true
+
+# Empaquetar solo lo del STAGE → ZIP en ../ (o sea, dist/)
+(
+  cd "$STAGE"
+  zip -r -X -9 "../$(basename "$OUT_ZIP")" .
+)
+
+# Limpieza del perfil temporal y del staging
+rm -rf "$TMP_PROFILE" "$STAGE" || true
+echo "✅ ZIP: $OUT_ZIP"
 echo "🎉 Listo. CRX y ZIP generados."

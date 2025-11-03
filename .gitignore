@@ -1,19 +1,19 @@
-# Artefactos de build y empaquetado
+# Build artifacts
 dist/
 *.crx
 *.zip
 
-# Claves privadas (¡no subir a git!)
+# Private keys
 *.pem
 
-# SO / IDE
+# OS / IDE
 .DS_Store
 __MACOSX/
 .idea/
 .vscode/
 
-# Dependencias (si llegas a tener)
+# If you ever add Node tooling
 node_modules/
 
-# Otros
-*.log
+# Shell scripts (no subirlos por error)
+*.sh
