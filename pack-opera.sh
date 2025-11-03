@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# === Ajusta si tu ruta cambia ===
-PROJECT_DIR="/Users/kamedina/WebstormProjects/notas-fluido"
+# === Ajustar si la ruta cambia ===
+PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 # Detectar Opera / Opera GX
 OPERA_APP=""
@@ -27,8 +27,11 @@ DIST="$PROJECT_DIR/dist"
 mkdir -p "$DIST"
 
 # ------- Gestión de clave .pem (para mantener el mismo ID) -------
-CANDIDATE_OUTSIDE="${PROJECT_DIR%/}.pem"          # /Users/.../notas-fluido.pem
-CANDIDATE_INSIDE="$PROJECT_DIR/notas-fluido.pem"  # /Users/.../notas-fluido/notas-fluido.pem
+CANDIDATE_OUTSIDE="${PROJECT_DIR%/}/fluid_notes.pem"
+CANDIDATE_INSIDE="$PROJECT_DIR/fluid_notes.pem"
+  # /Users/.../notas-fluido/notas-fluido.pem
+  NAME="fluid_notes"
+
 
 # Si está ADENTRO, muévela AFUERA (Opera no permite empaquetarla dentro)
 if [ -f "$CANDIDATE_INSIDE" ]; then
@@ -80,7 +83,7 @@ for i in {1..12}; do
   sleep 0.5
 done
 
-OUT_CRX="$DIST/notas-fluido-$VERSION.crx"
+OUT_CRX="$DIST/fluid_notes-$VERSION.crx"
 if [ -f "$SRC_CRX" ]; then
   mv -f "$SRC_CRX" "$OUT_CRX"
   echo "✅ CRX: $OUT_CRX"
@@ -99,9 +102,11 @@ if [ -z "${KEY_PATH:-}" ] && [ -f "$SRC_PEM" ]; then
   echo "🔑 Clave generada: $CANDIDATE_OUTSIDE (guárdala para mantener el mismo ID)"
 fi
 
+NAME="fluid_notes"
+
 # ------- ZIP para la tienda usando STAGING (whitelist) -------
 echo "🗜️  Creando ZIP para la tienda (whitelist)…"
-OUT_ZIP="$DIST/notas-fluido-$VERSION.zip"
+OUT_ZIP="$DIST/fluid_notes-$VERSION.zip"
 STAGE="$DIST/.store-stage"
 rm -rf "$STAGE"
 mkdir -p "$STAGE/assets"
