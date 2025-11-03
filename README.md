@@ -1,4 +1,4 @@
-# Fluid Notes (Notas Fluido)
+# Fluid Notes
 
 A minimal Apple-style notepad for Opera, built with Google Fonts, dark/light themes, and persistent local storage.
 
