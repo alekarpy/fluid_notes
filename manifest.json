@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "Fluent Notes",
+  "version": "0.3.3",
+  "description": "Apple-style notepad with Google Fonts, variable axes, search engine and dark mode.",
+  "homepage_url": "https://alekarpy.uk/donate/",
+  "action": {
+    "default_title": "Fluent Notes",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "128": "assets/icon-128.png"
+    }
+  },
+  "permissions": ["storage", "downloads", "contextMenus"],
+  "background": { "service_worker": "service_worker.js" },
+  "icons": {
+    "128": "assets/icon-128.png"
+  },
+  "commands": {
+    "new-note": {
+      "suggested_key": { "default": "Ctrl+Shift+N" },
+      "description": "Create New Note"
+    }
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:"
+  }
+}

@@ -1,0 +1,80 @@
+/* Base */
+*{box-sizing:border-box}
+:root{
+    --radius:18px;--shadow:0 4px 20px rgba(0,0,0,.08);
+    --divider:rgba(0,0,0,.06);--ink:#111;--ink-soft:#666;
+    --panel:rgba(255,255,255,.65);--glass-bg:rgba(255,255,255,.7);--glass-stroke:rgba(255,255,255,.3);
+    --hover:rgba(0,0,0,.06);--focus:rgba(0,122,255,.25)
+}
+body[data-theme="dark"]{
+    --divider:rgba(255,255,255,.08);--ink:#f1f1f1;--ink-soft:#aaa;
+    --panel:rgba(35,35,35,.6);--glass-bg:rgba(30,30,30,.6);--glass-stroke:rgba(255,255,255,.08);
+    --hover:rgba(255,255,255,.08);--focus:rgba(10,132,255,.28)
+}
+
+/* Layout */
+.wrap{display:grid;grid-template-columns:250px 1fr;gap:16px;padding:16px;height:100vh}
+.glass{background:var(--glass-bg);backdrop-filter:saturate(180%) blur(24px);border:1px solid var(--glass-stroke);border-radius:var(--radius);box-shadow:var(--shadow)}
+
+/* Sidebar */
+.sidebar{display:flex;flex-direction:column;overflow:hidden}
+.sidebar header{display:flex;flex-wrap:wrap;align-items:center;padding:12px;border-bottom:1px solid var(--divider);row-gap:10px;column-gap:16px}
+.brand{display:flex;align-items:center;gap:10px;flex:1 1 100%}
+.logo{width:20px;height:20px;border-radius:4px}
+.sidebar h1{font-size:15px;font-weight:700;margin:0;color:var(--ink)}
+.actions{display:flex;align-items:center;gap:10px;flex:1 1 100%}
+.search{flex:1 1 auto;min-width:0;height:30px;padding:6px 10px;border-radius:999px;border:1px solid var(--divider);background:var(--panel);color:var(--ink)}
+.search::placeholder{color:var(--ink-soft)}
+.pill{border:0;border-radius:999px;padding:6px 12px;background:#f2f2f7;cursor:pointer;transition:transform .04s ease,box-shadow .15s ease;white-space:nowrap;min-height:30px;font-weight:500}
+.pill:hover{transform:translateY(-1px)}
+.pill:focus{outline:none;box-shadow:0 0 0 3px var(--focus)}
+.pill.danger{background:#ffe8e8;color:#b00020}
+body[data-theme="dark"] .pill{background:#2c2c2e;color:var(--ink)}
+body[data-theme="dark"] .pill.danger{background:#4a1f1f;color:#ffd2d2}
+
+/* List */
+.note-list{list-style:none;margin:0;padding:6px;overflow:auto}
+.note-list li{display:flex;flex-direction:column;gap:2px;padding:8px 10px;border-radius:12px;cursor:pointer;transition:background .15s ease}
+.note-list li:hover{background:rgba(0,0,0,.04)}
+.note-list li.active{background:rgba(0,0,0,.06)}
+body[data-theme="dark"] .note-list li.active{background:rgba(255,255,255,.08)}
+.note-list .title{font-size:13px;font-weight:600;color:var(--ink)}
+.note-list .preview{font-size:12px;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* Editor */
+.editor{display:flex;flex-direction:column;overflow:visible}
+
+/* Toolbar -> 2 filas fijas */
+.toolbar{display:grid;grid-template-columns:1fr;grid-template-rows:auto auto;gap:8px;padding:10px;border-bottom:1px solid var(--divider)}
+.toolbar-main{display:flex;align-items:center;gap:6px;flex-wrap:nowrap;overflow:hidden}
+.toolbar-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+
+/* Compactar controles para que quepa “• List” en fila 1 */
+.toolbar select{
+    appearance:none;font:13px/1.1 inherit;color:var(--ink);
+    background:var(--panel);border:1px solid var(--divider);border-radius:12px;
+    padding:6px 24px 6px 10px;min-height:30px;outline:none;transition:box-shadow .15s ease,border-color .15s ease
+}
+#fontFamily{max-width:150px}   /* ↓ más corto */
+#fontSize{width:64px;text-align:center}
+
+/* Color chips más pequeños */
+.toolbar input[type="color"]{
+    appearance:none;width:26px;height:20px;padding:0;border:1px solid var(--divider);border-radius:7px;background:transparent;cursor:pointer
+}
+.toolbar input[type="color"]::-webkit-color-swatch-wrapper{padding:2px}
+.toolbar input[type="color"]::-webkit-color-swatch{border:none;border-radius:5px}
+
+/* Botones inline (B,U,List) */
+.toolbar .tool{border:0;background:transparent;padding:6px 8px;border-radius:10px;cursor:pointer;color:var(--ink);min-height:30px}
+.toolbar .tool:hover{background:var(--hover)}
+.toolbar .tool:focus{outline:none;box-shadow:0 0 0 3px var(--focus)}
+
+/* Campos */
+.title{margin:12px;padding:8px 12px;font-size:20px;font-weight:700;border:0;border-radius:12px;background:rgba(255,255,255,.8);color:var(--ink)}
+body[data-theme="dark"] .title{background:rgba(255,255,255,.08)}
+.title:focus{outline:2px solid var(--focus)}
+.pad{margin:0 12px 12px;padding:16px 18px;border-radius:16px;min-height:260px;overflow:auto;background:rgba(255,255,255,.85);border:1px dashed var(--divider);color:var(--ink)}
+body[data-theme="dark"] .pad{background:rgba(255,255,255,.06)}
+.pad:focus{outline:2px solid var(--focus)}
+#editor{line-height:1.45;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}

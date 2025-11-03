@@ -1,0 +1,19 @@
+# Artefactos de build y empaquetado
+dist/
+*.crx
+*.zip
+
+# Claves privadas (¡no subir a git!)
+*.pem
+
+# SO / IDE
+.DS_Store
+__MACOSX/
+.idea/
+.vscode/
+
+# Dependencias (si llegas a tener)
+node_modules/
+
+# Otros
+*.log
