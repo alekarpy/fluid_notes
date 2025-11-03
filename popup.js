@@ -110,7 +110,9 @@ function applyEditorStyles({fontKey="system-ui", fontSize="16px", fgColor="#0000
     editor.style.fontFamily = cssFont(fontKey);
     editor.style.fontSize   = fontSize;
     editor.style.color      = fgColor;
-    editor.style.background = bgColor + (bgColor.length===7 ? "cc" : "");
+// Aplica el color al contenedor (.pad) en lugar del editor interno
+    const pad = editor.closest('.pad');
+    if (pad) pad.style.background = bgColor;
 }
 
 /* Ensure note exists when user starts typing */
@@ -223,6 +225,17 @@ function bindInputs(){
     $("#bgColor").addEventListener("input",      ()=>{ applyEditorStyles(currentSettings()); ensureActiveNote(); persistNote(); });
 
     $("#searchInput").addEventListener("input", debounce((e)=> renderList(e.target.value), 120));
+
+    $("#editor").addEventListener("paste", (e) => {
+        e.preventDefault();
+        const html = e.clipboardData.getData("text/html");
+        const clean = html
+            .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "") // quita estilos incrustados
+            .replace(/ style="[^"]*"/gi, "");                // quita atributos de estilo
+        document.execCommand("insertHTML", false, clean);
+    });
+
+
 
     // Save on close to avoid loss if user didn't click
     window.addEventListener('beforeunload', ()=> { try{ persistNote.flush(); }catch{} });
