@@ -32,6 +32,9 @@ body[data-theme="dark"]{
 body[data-theme="dark"] .pill{background:#2c2c2e;color:var(--ink)}
 body[data-theme="dark"] .pill.danger{background:#4a1f1f;color:#ffd2d2}
 
+.pill.primary { background: #007aff; color: #fff; }
+.pill.primary:hover { filter: brightness(0.95); transform: translateY(-1px); }
+
 /* List */
 .note-list{list-style:none;margin:0;padding:6px;overflow:auto}
 .note-list li{display:flex;flex-direction:column;gap:2px;padding:8px 10px;border-radius:12px;cursor:pointer;transition:background .15s ease}
@@ -78,35 +81,3 @@ body[data-theme="dark"] .title{background:rgba(255,255,255,.08)}
 body[data-theme="dark"] .pad{background:rgba(255,255,255,.06)}
 .pad:focus{outline:2px solid var(--focus)}
 #editor{line-height:1.45;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
-
-/* Asegura que el editor no se corte */
-.editor-container {
-    overflow-x: hidden;
-    overflow-y: auto;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-/* Si estás usando un contenedor principal dividido en dos columnas */
-.main {
-    display: grid;
-    grid-template-columns: 260px 1fr; /* panel izquierdo + área de notas */
-    overflow: hidden;
-    max-width: 100%;
-}
-
-/* Asegura que el texto se ajuste dentro */
-textarea, .note-body, .editor {
-    max-width: 100%;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-}
-
-#donate-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    opacity: 0.6;
-    transition: opacity .2s ease;
-}
-#donate-btn:hover { opacity: 1; }

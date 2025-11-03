@@ -212,7 +212,7 @@ function bindInputs(){
     $("#themeToggle").addEventListener("click", cycleTheme);
     $("#saveNote").addEventListener("click", saveAndNew);
     $("#donateBtn").addEventListener("click", () =>
-        window.open("https://alekarpy.uk/donate/", "_blank", "noopener")
+        window.open("https://alekarpy.github.io/fluid_notes", "_blank", "noopener")
     );
     $("#titleInput").addEventListener("input", ()=>{ ensureActiveNote(); persistNote(); });
     $("#editor").addEventListener("input", ()=>{ ensureActiveNote(); persistNote(); });
