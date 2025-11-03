@@ -219,6 +219,8 @@ function bindInputs(){
     $("#titleInput").addEventListener("input", ()=>{ ensureActiveNote(); persistNote(); });
     $("#editor").addEventListener("input", ()=>{ ensureActiveNote(); persistNote(); });
 
+
+
     $("#fontFamily").addEventListener("change",  ()=>{ applyEditorStyles(currentSettings()); ensureActiveNote(); persistNote(); });
     $("#fontSize").addEventListener("change",    ()=>{ applyEditorStyles(currentSettings()); ensureActiveNote(); persistNote(); });
     $("#fgColor").addEventListener("input",      ()=>{ applyEditorStyles(currentSettings()); ensureActiveNote(); persistNote(); });
@@ -226,13 +228,32 @@ function bindInputs(){
 
     $("#searchInput").addEventListener("input", debounce((e)=> renderList(e.target.value), 120));
 
+
+    $("#editor").on("paste", (e) => {
+        e.preventDefault();
+        const data = e.originalEvent.clipboardData;
+        let html = data.getData("text/html");
+        let text = data.getData("text/plain");
+
+        // Si no hay HTML, usa texto plano
+        const content = html || text;
+
+        if (content) {
+            document.execCommand("insertText", false, content);
+        }
+    });
+
     $("#editor").addEventListener("paste", (e) => {
         e.preventDefault();
         const html = e.clipboardData.getData("text/html");
+
         const clean = html
-            .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "") // quita estilos incrustados
-            .replace(/ style="[^"]*"/gi, "");                // quita atributos de estilo
+            .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "")
+            .replace(/ style="[^"]*"/gi, "")
+            .replace(/<\/(div|p)>/gi, "</$1><br>");
+        // quita atributos de estilo
         document.execCommand("insertHTML", false, clean);
+
     });
 
 

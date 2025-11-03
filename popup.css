@@ -139,3 +139,10 @@ body[data-theme="dark"] .pad{background:rgba(255,255,255,.06)}
     overflow-wrap: break-word;
     word-break: break-word;
 }
+
+#titleInput {
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
