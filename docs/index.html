@@ -3,8 +3,9 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Support Notas Fluido – Donate</title>
+    <title>Support Fluid Notes – Donate</title>
     <meta name="description" content="If Notas Fluido helps you, consider supporting its development with a small donation. Thank you!">
+    <!-- Si estás en GitHub Pages dentro de /docs, deja este path -->
     <link rel="icon" href="assets/icon-128.png" />
     <style>
         :root{
@@ -33,11 +34,11 @@
         .head img{width:28px; height:28px; border-radius:6px}
         h1{font-size:22px; margin:0}
         p{margin:6px 0 0; color:var(--soft)}
-        .grid{display:grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap:12px; margin-top:18px}
+        .grid{display:grid; grid-template-columns: repeat(auto-fit, minmax(260px,1fr)); gap:14px; margin-top:18px}
         .btn{
             display:flex; align-items:center; justify-content:center; gap:10px;
-            padding:12px 14px; border-radius:14px; border:1px solid rgba(0,0,0,.06);
-            background:#fff; color:#111; text-decoration:none; font-weight:600;
+            padding:14px 16px; border-radius:14px; border:1px solid rgba(0,0,0,.06);
+            background:#fff; color:#111; text-decoration:none; font-weight:700;
             transition: transform .06s ease, box-shadow .2s ease, border-color .2s ease;
             box-shadow: 0 6px 20px rgba(0,0,0,.06);
         }
@@ -52,25 +53,35 @@
 <main class="wrap">
     <section class="card">
         <div class="head">
+            <!-- Si estás en /donate dentro de la extensión, usa ../assets/icon-128.png -->
             <img src="assets/icon-128.png" alt="Notas Fluido icon">
             <h1>Support <strong>Notas Fluido</strong></h1>
         </div>
         <p>If this extension saves you time, consider supporting its development. Your contribution helps keep it fast, stable and ad-free. Thank you! 💜</p>
 
         <div class="grid">
-            <a class="btn accent" href="https://www.buymeacoffee.com/YOUR_BMAC_LINK" target="_blank" rel="noopener">
+            <!-- Buy Me a Coffee -->
+            <a class="btn accent" href="https://buymeacoffee.com/alekarpyy" target="_blank" rel="noopener noreferrer">
                 <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 8h1a3 3 0 1 1 0 6h-1a6 6 0 0 1-12 0V8h12Zm0 2v2h1a1 1 0 1 0 0-2h-1Z"/><path d="M6 4h12v2H6z"/></svg>
                 Buy me a coffee
             </a>
-            <a class="btn" href="https://www.paypal.com/donate/?hosted_button_id=YOUR_BUTTON_ID" target="_blank" rel="noopener">
-                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 19l1.2-7.2C8.4 9 9.7 8 12 8h3.7c.9 0 1.6.8 1.4 1.7l-.2 1.1c-.2 1-1 1.7-2 1.7H12l-.3 2H15c.9 0 1.7.8 1.5 1.7l-.1.6c-.1.9-.9 1.6-1.8 1.6H7Z"/></svg>
+
+            <!-- PayPal (elige una de estas dos URLs y borra la otra) -->
+            <!-- Opción A: paypal.me (rápida). Puedes incluir monto: /5 o /5USD -->
+            <!-- PayPal (nuevo logo SVG real) -->
+            <a class="btn" href="https://paypal.me/alekarp" target="_blank" rel="noopener noreferrer">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M13.98 2h-4.8a1 1 0 0 0-.99.84L6 20.9a.6.6 0 0 0 .6.69h3.38a1 1 0 0 0 .99-.84l.26-1.6a1 1 0 0 1 .99-.84h1.51c4.53 0 8.16-1.83 9.2-7.15.44-2.23 0-3.95-1.3-5.18C21.13 4.08 19.03 3 16.15 3h-2.17Zm.27 10.12h-1.8a1 1 0 0 0-.99.84l-.46 2.8a.6.6 0 0 1-.6.51H8.93l1.15-7.18a.6.6 0 0 1 .6-.51h3.3c1.12 0 2 .26 2.53.75.49.44.64 1.08.45 2.07-.39 1.97-1.76 1.72-2.71 1.72Z"/>
+                </svg>
                 PayPal
             </a>
-            <a class="btn" href="https://patreon.com/YOUR_PATREON" target="_blank" rel="noopener">
-                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-6.7-4.4-9.3-7.1A6 6 0 0 1 12 6a6 6 0 0 1 9.3 7.9C18.7 16.6 12 21 12 21Z"/></svg>
-                Patreon
-            </a>
-            <a class="btn" href="https://github.com/sponsors/YOUR_GITHUB" target="_blank" rel="noopener">
+            <!-- Opción B: botón hospedado (si tienes hosted_button_id):
+            <a class="btn" href="https://www.paypal.com/donate/?hosted_button_id=YOUR_BUTTON_ID" target="_blank" rel="noopener noreferrer">
+              ... PayPal ...
+            </a> -->
+
+            <!-- GitHub Sponsors -->
+            <a class="btn" href="https://github.com/sponsors/alekarpy" target="_blank" rel="noopener noreferrer">
                 <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2.2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.3-1.8-1.3-1.8-1-.7.1-.7.1-.7 1.1.1 1.7 1.1 1.7 1.1 1 .1.8 1.8 2.7 2.5.5-.4.8-.8.9-1.2-2.7-.3-5.6-1.3-5.6-6a4.6 4.6 0 0 1 1.2-3.2c-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.3 1.2a11.3 11.3 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.6 1.6.2 2.8.1 3.1A4.6 4.6 0 0 1 20 16c0 4.7-2.9 5.6-5.6 6 .4.3 1 1 1 2.1v3.1c0 .3.2.7.8.6A12 12 0 0 0 12 .5Z"/></svg>
                 GitHub Sponsors
             </a>
