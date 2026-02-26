@@ -12,6 +12,17 @@ body[data-theme="dark"]{
     --hover:rgba(255,255,255,.08);--focus:rgba(10,132,255,.28)
 }
 
+/* Fija el tamaño total de la ventana para que no crezca ni se deforme */
+html, body {
+    width: 780px;
+    height: 560px;
+    margin: 0;
+    overflow: hidden; /* Prohíbe que toda la ventana haga scroll */
+    color: var(--ink);
+    font: 14px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+    background: linear-gradient(135deg, var(--bg-grad-a) 0%, var(--bg-grad-b) 100%);
+}
+
 /* Layout */
 .wrap{display:grid;grid-template-columns:250px 1fr;gap:16px;padding:16px;height:100vh}
 .glass{background:var(--glass-bg);backdrop-filter:saturate(180%) blur(24px);border:1px solid var(--glass-stroke);border-radius:var(--radius);box-shadow:var(--shadow)}
@@ -44,55 +55,62 @@ body[data-theme="dark"] .note-list li.active{background:rgba(255,255,255,.08)}
 .note-list .title{font-size:13px;font-weight:600;color:var(--ink)}
 .note-list .preview{font-size:12px;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-/* Editor */
+/* El contenedor derecho */
 .editor {
     display: flex;
     flex-direction: column;
-    overflow: hidden;         /* 🔧 evita que el contenido se desborde */
-    max-width: 100%;          /* 🔧 no dejar crecer más del panel */
-    flex: 1 1 auto;
+    overflow: hidden; /* Evita que se corten las esquinas inferiores */
+    height: 100%;
 }
 
-.editor .pad {
-    max-width: 100%;
-    overflow-x: auto;
-    /* 🔧 si hay código muy largo, solo scroll horizontal interno */
+/* Toolbar -> Configuración de 2 filas ordenadas */
+.toolbar{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    padding:10px;
+    border-bottom:1px solid var(--divider)
 }
 
-.pad {
-    background: transparent;
-}
-body[data-theme="dark"] .pad {
-    background: transparent;
+.toolbar-formatting,
+.toolbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap; /* Permite bajar de línea si la pantalla es muy pequeña */
 }
 
-/* Toolbar -> 2 filas fijas */
-.toolbar{display:grid;grid-template-columns:1fr;grid-template-rows:auto auto;gap:8px;padding:10px;border-bottom:1px solid var(--divider)}
-.toolbar-main{display:flex;align-items:center;gap:6px;flex-wrap:nowrap;overflow:hidden}
-.toolbar-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-
-/* Compactar controles para que quepa “• List” en fila 1 */
+/* Solo las herramientas tienen este selector */
 .toolbar select{
     appearance:none;font:13px/1.1 inherit;color:var(--ink);
     background:var(--panel);border:1px solid var(--divider);border-radius:12px;
     padding:6px 24px 6px 10px;min-height:30px;outline:none;transition:box-shadow .15s ease,border-color .15s ease
 }
-#fontFamily{max-width:150px}   /* ↓ más corto */
+#fontFamily{max-width:150px}
 #fontSize{width:64px;text-align:center}
 
-/* Color chips más pequeños */
+/* Color chips corregidos */
 .toolbar input[type="color"] {
-    appearance:none;
-    width:32px;
-    height:26px;
-    padding:0;
-    border:1px solid var(--divider);
-    border-radius:8px;
-    background:transparent;
-    cursor:pointer;
+    -webkit-appearance: none;
+    appearance: none;
+    width: 28px;
+    height: 28px;
+    padding: 2px;
+    border: 1px solid var(--divider);
+    border-radius: 8px;
+    background-color: var(--panel);
+    cursor: pointer;
+    flex-shrink: 0;
 }
-.toolbar input[type="color"]::-webkit-color-swatch-wrapper { padding:2px; }
-.toolbar input[type="color"]::-webkit-color-swatch { border:none; border-radius:6px; }
+
+.toolbar input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+.toolbar input[type="color"]::-webkit-color-swatch {
+    border: 1px solid rgba(0,0,0,0.15);
+    border-radius: 5px;
+}
 
 /* Botones inline (B,U,List) */
 .toolbar .tool{border:0;background:transparent;padding:6px 8px;border-radius:10px;cursor:pointer;color:var(--ink);min-height:30px}
@@ -103,46 +121,35 @@ body[data-theme="dark"] .pad {
 .title{margin:12px;padding:8px 12px;font-size:20px;font-weight:700;border:0;border-radius:12px;background:rgba(255,255,255,.8);color:var(--ink)}
 body[data-theme="dark"] .title{background:rgba(255,255,255,.08)}
 .title:focus{outline:2px solid var(--focus)}
+
+/* La caja de texto corregida */
 .pad {
     margin: 0 12px 12px;
     padding: 16px 18px;
     border-radius: 16px;
-    min-height: 260px;
-    overflow: auto;
+    flex: 1; /* Hace que tome todo el espacio vertical sobrante de forma perfecta */
     background: rgba(255,255,255,.85);
     border: 1px dashed var(--divider);
     color: var(--ink);
 
-    /* 🔧 Mantener dentro del panel */
-    width: calc(100% - 24px); /* compensa los márgenes horizontales */
-    max-width: calc(100% - 24px);
-    box-sizing: border-box;
-
-    /* 🔧 Ajustar texto */
+    /* Configuración del scroll y el texto para que no crezca la ventana */
+    overflow-y: auto; /* Solo esta caja tendrá scroll si el texto es muy largo */
+    overflow-x: hidden;
     white-space: pre-wrap;
-    word-break: break-word;
-}
-
-
-
-body[data-theme="dark"] .pad{background:rgba(255,255,255,.06)}
-.pad:focus{outline:2px solid var(--focus)}
-
-#editor {
-    line-height: 1.45;
-    -webkit-font-smoothing: antialiased;
-    text-rendering: optimizeLegibility;
-
-    /* 🔧 Ajuste de texto largo */
-    white-space: pre-wrap;
-    word-wrap: break-word;
     overflow-wrap: break-word;
     word-break: break-word;
 }
 
-#titleInput {
+body[data-theme="dark"] .pad{background:rgba(255,255,255,.06)}
+.pad:focus{outline:2px solid var(--focus)}
+
+#editor{line-height:1.45;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;outline:none;}
+
+/* MAGIA PARA QUE LAS IMÁGENES SE ADAPTEN SOLAS */
+#editor img {
     max-width: 100%;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    height: auto;
+    border-radius: 8px; /* Le da un toque estético a las esquinas de la imagen */
+    display: block;
+    margin: 10px 0;
 }

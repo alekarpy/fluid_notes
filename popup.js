@@ -1,6 +1,6 @@
 // Helpers
 const $ = sel => document.querySelector(sel);
-const uid = () => crypto.randomUUID();
+const uid = () => crypto?.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).substring(2);
 const debounce = (fn, ms=160) => { let t; const w=(...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms); }; w.flush=()=>fn(); return w; };
 
 // State
@@ -23,7 +23,6 @@ const cssFont = key => key === 'system-ui'
 /* Persistence */
 async function loadState(){
     const {notes=[],selectedId=null,ui={theme:'auto'}} = await chrome.storage.local.get(["notes","selectedId","ui"]);
-    // migrate old fontFamily -> fontKey
     notes.forEach(n=>{
         n.settings = n.settings || {};
         if (!n.settings.fontKey) {
@@ -35,7 +34,7 @@ async function loadState(){
     state.notes = notes;
     state.selectedId = selectedId || notes[0]?.id || null;
     state.ui = ui;
-    await chrome.storage.local.set({notes}); // persist migration
+    await chrome.storage.local.set({notes});
     applyTheme(ui.theme || 'auto');
 }
 async function saveState(){ await chrome.storage.local.set({notes:state.notes, selectedId:state.selectedId, ui:state.ui}); }
@@ -72,7 +71,7 @@ function renderList(filter=""){
     const term = filter.trim().toLowerCase();
     const items = state.notes.map(n=>({
         id:n.id,
-        title:n.title || "(Untitled)",
+        title:n.title || "Nueva Nota",
         preview: stripHtml(n.html).slice(0,200),
         match: !term || (n.title && n.title.toLowerCase().includes(term)) || stripHtml(n.html).toLowerCase().includes(term)
     })).filter(x=>x.match);
@@ -98,10 +97,10 @@ function renderEditor(){
     title.value = note.title || "";
     editor.innerHTML = note.html || "";
     const s = note.settings || {};
-    $("#fontFamily").value = s.fontKey || 'system-ui';
-    $("#fontSize").value   = s.fontSize || "16px";
-    $("#fgColor").value    = s.fgColor  || "#000000";  // default black
-    $("#bgColor").value    = s.bgColor  || "#ffffff";  // default white
+    if($("#fontFamily")) $("#fontFamily").value = s.fontKey || 'system-ui';
+    if($("#fontSize")) $("#fontSize").value   = s.fontSize || "16px";
+    if($("#fgColor")) $("#fgColor").value    = s.fgColor  || "#000000";
+    if($("#bgColor")) $("#bgColor").value    = s.bgColor  || "#ffffff";
     applyEditorStyles(currentSettings());
 }
 
@@ -110,9 +109,7 @@ function applyEditorStyles({fontKey="system-ui", fontSize="16px", fgColor="#0000
     editor.style.fontFamily = cssFont(fontKey);
     editor.style.fontSize   = fontSize;
     editor.style.color      = fgColor;
-// Aplica el color al contenedor (.pad) en lugar del editor interno
-    const pad = editor.closest('.pad');
-    if (pad) pad.style.background = bgColor;
+    editor.style.background = bgColor + (bgColor.length===7 ? "cc" : "");
 }
 
 /* Ensure note exists when user starts typing */
@@ -120,28 +117,28 @@ function ensureActiveNote(){
     if (state.selectedId) return;
     const n = {
         id: uid(),
-        title: $("#titleInput").value.trim() || "New note",
-        html: $("#editor").innerHTML || "",
+        title: $("#titleInput")?.value?.trim() || "Nueva Nota",
+        html: $("#editor")?.innerHTML || "",
         settings: currentSettings()
     };
     state.notes.unshift(n);
     state.selectedId = n.id;
     saveState();
-    renderList($("#searchInput").value||"");
+    renderList($("#searchInput")?.value||"");
 }
 
-function selectNote(id){ state.selectedId=id; saveState(); renderList($("#searchInput").value||""); renderEditor(); }
+function selectNote(id){ state.selectedId=id; saveState(); renderList($("#searchInput")?.value||""); renderEditor(); }
 
 function newNote(initialText=""){
     const n = {
         id: uid(),
-        title: "New note",
+        title: "Nueva Nota",
         html: initialText ? `<p>${escapeHtml(initialText)}</p>` : "",
-        settings: { fontKey:"system-ui", fontSize:"16px", fgColor:"#000000", bgColor:"#ffffff" } // defaults updated
+        settings: { fontKey:"system-ui", fontSize:"16px", fgColor:"#000000", bgColor:"#ffffff" }
     };
     state.notes.unshift(n);
     state.selectedId = n.id;
-    saveState(); renderList($("#searchInput").value||""); renderEditor();
+    saveState(); renderList($("#searchInput")?.value||""); renderEditor();
     $("#titleInput")?.focus();
 }
 
@@ -151,7 +148,7 @@ function deleteCurrent(){
     if (i>=0){
         state.notes.splice(i,1);
         state.selectedId = state.notes[0]?.id ?? null;
-        saveState(); renderList($("#searchInput").value||""); renderEditor();
+        saveState(); renderList($("#searchInput")?.value||""); renderEditor();
     }
 }
 
@@ -159,25 +156,19 @@ function deleteCurrent(){
 const persistNote = debounce(() => saveCurrentOnly(), 150);
 
 function saveCurrentOnly(){
-    ensureActiveNote(); // create if empty list
+    ensureActiveNote();
     const note = state.notes.find(n=>n.id===state.selectedId); if(!note) return;
-    note.title = $("#titleInput").value.trim() || "Untitled";
-    note.html  = $("#editor").innerHTML;
+    note.title = $("#titleInput")?.value?.trim() || "Nueva Nota";
+    note.html  = $("#editor")?.innerHTML || "";
     note.settings = currentSettings();
-    saveState(); renderList($("#searchInput").value||"");
-}
-
-// Save & New
-function saveAndNew(){
-    saveCurrentOnly();
-    newNote();
+    saveState(); renderList($("#searchInput")?.value||"");
 }
 
 function escapeHtml(s){
     return s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 }
 
-// Export TXT including Title + body
+// Export TXT
 async function exportTxt(){
     ensureActiveNote();
     const note = state.notes.find(n=>n.id===state.selectedId); if(!note) return;
@@ -201,73 +192,98 @@ async function exportTxt(){
 function bindFormatting(){
     document.querySelectorAll('[data-cmd]').forEach(btn=>{
         btn.addEventListener('click', ()=>{
-            document.execCommand(btn.dataset.cmd, false); // bold/underline/list act on selection
+            document.execCommand(btn.dataset.cmd, false);
             persistNote();
         });
     });
 }
 
+// --- BACKUP & RESTORE LOGIC ---
+async function backupNotes() {
+    ensureActiveNote();
+    try { persistNote.flush(); } catch{}
+
+    const data = JSON.stringify(state.notes, null, 2);
+    const blob = new Blob([data], {type: 'application/json;charset=utf-8'});
+    const url = URL.createObjectURL(blob);
+    const date = new Date().toISOString().split('T')[0];
+    const filename = `FluentNotes_Backup_${date}.json`;
+
+    try {
+        if (chrome?.downloads?.download) {
+            await chrome.downloads.download({ url, filename: filename, saveAs: true });
+        } else {
+            const a = document.createElement('a'); a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
+        }
+    } catch(e) {
+        const a = document.createElement('a'); a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
+    } finally {
+        setTimeout(()=>URL.revokeObjectURL(url), 10000);
+    }
+}
+
+function restoreNotes(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+        try {
+            const importedNotes = JSON.parse(e.target.result);
+            if (Array.isArray(importedNotes)) {
+                state.notes = importedNotes;
+                state.selectedId = importedNotes[0]?.id || null;
+                await saveState();
+                renderList($("#searchInput")?.value || "");
+                renderEditor();
+                alert("¡Notas restauradas con éxito!");
+            } else {
+                alert("El archivo no tiene el formato correcto de notas.");
+            }
+        } catch (err) {
+            alert("Error al leer el archivo JSON. Asegúrate de que sea un backup válido.");
+        }
+    };
+    reader.readAsText(file);
+    event.target.value = '';
+}
+
 function bindInputs(){
-    $("#addNote").addEventListener("click", ()=> newNote());
-    $("#deleteNote").addEventListener("click", deleteCurrent);
-    $("#exportTxt").addEventListener("click", exportTxt);
-    $("#themeToggle").addEventListener("click", cycleTheme);
-    $("#saveNote").addEventListener("click", saveAndNew);
-    $("#donateBtn").addEventListener("click", () =>
-        window.open("https://alekarpy.github.io/fluid_notes", "_blank", "noopener")
-    );
-    $("#titleInput").addEventListener("input", ()=>{ ensureActiveNote(); persistNote(); });
-    $("#editor").addEventListener("input", ()=>{ ensureActiveNote(); persistNote(); });
+    // Aquí están los escudos protectores (?.)
+    $("#addNote")?.addEventListener("click", ()=> newNote());
+    $("#deleteNote")?.addEventListener("click", deleteCurrent);
+    $("#exportTxt")?.addEventListener("click", exportTxt);
 
+    $("#backupBtn")?.addEventListener("click", backupNotes);
+    $("#restoreBtn")?.addEventListener("click", () => $("#restoreFile")?.click());
+    $("#restoreFile")?.addEventListener("change", restoreNotes);
 
+    $("#themeToggle")?.addEventListener("click", cycleTheme);
 
-    $("#fontFamily").addEventListener("change",  ()=>{ applyEditorStyles(currentSettings()); ensureActiveNote(); persistNote(); });
-    $("#fontSize").addEventListener("change",    ()=>{ applyEditorStyles(currentSettings()); ensureActiveNote(); persistNote(); });
-    $("#fgColor").addEventListener("input",      ()=>{ applyEditorStyles(currentSettings()); ensureActiveNote(); persistNote(); });
-    $("#bgColor").addEventListener("input",      ()=>{ applyEditorStyles(currentSettings()); ensureActiveNote(); persistNote(); });
+    $("#titleInput")?.addEventListener("input", ()=>{ ensureActiveNote(); persistNote(); });
+    $("#editor")?.addEventListener("input", ()=>{ ensureActiveNote(); persistNote(); });
 
-    $("#searchInput").addEventListener("input", debounce((e)=> renderList(e.target.value), 120));
+    $("#fontFamily")?.addEventListener("change",  ()=>{ applyEditorStyles(currentSettings()); ensureActiveNote(); persistNote(); });
+    $("#fontSize")?.addEventListener("change",    ()=>{ applyEditorStyles(currentSettings()); ensureActiveNote(); persistNote(); });
+    $("#fgColor")?.addEventListener("input",      ()=>{ applyEditorStyles(currentSettings()); ensureActiveNote(); persistNote(); });
+    $("#bgColor")?.addEventListener("input",      ()=>{ applyEditorStyles(currentSettings()); ensureActiveNote(); persistNote(); });
 
+    $("#searchInput")?.addEventListener("input", debounce((e)=> renderList(e.target.value), 120));
 
-    $("#editor").on("paste", (e) => {
-        e.preventDefault();
-        const data = e.originalEvent.clipboardData;
-        let html = data.getData("text/html");
-        let text = data.getData("text/plain");
-
-        // Si no hay HTML, usa texto plano
-        const content = html || text;
-
-        if (content) {
-            document.execCommand("insertText", false, content);
+    // Guardado forzoso al ocultar la extensión
+    document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === 'hidden') {
+            saveCurrentOnly();
         }
     });
-
-    $("#editor").addEventListener("paste", (e) => {
-        e.preventDefault();
-        const html = e.clipboardData.getData("text/html");
-
-        const clean = html
-            .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "")
-            .replace(/ style="[^"]*"/gi, "")
-            .replace(/<\/(div|p)>/gi, "</$1><br>");
-        // quita atributos de estilo
-        document.execCommand("insertHTML", false, clean);
-
-    });
-
-
-
-    // Save on close to avoid loss if user didn't click
-    window.addEventListener('beforeunload', ()=> { try{ persistNote.flush(); }catch{} });
 }
 
 function currentSettings(){
     return {
-        fontKey: $("#fontFamily").value || "system-ui",
-        fontSize: $("#fontSize").value  || "16px",
-        fgColor: $("#fgColor").value    || "#000000", // default black
-        bgColor: $("#bgColor").value    || "#ffffff"  // default white
+        fontKey: $("#fontFamily")?.value || "system-ui",
+        fontSize: $("#fontSize")?.value  || "16px",
+        fgColor: $("#fgColor")?.value    || "#000000",
+        bgColor: $("#bgColor")?.value    || "#ffffff"
     };
 }
 
@@ -275,7 +291,7 @@ async function main(){
     populateFontSelect();
     await loadState();
     renderList("");
-    renderEditor(); // empty or existing — inputs will create on first edit via ensureActiveNote
+    renderEditor();
     bindFormatting();
     bindInputs();
 }

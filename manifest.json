@@ -1,9 +1,9 @@
 {
   "manifest_version": 3,
   "name": "Fluent Notes",
-  "version": "0.3.10",
+  "version": "0.3.3",
   "description": "Apple-style notepad with Google Fonts, variable axes, search engine and dark mode.",
-  "homepage_url": "https://alekarpy.github.io/fluid_notes",
+  "homepage_url": "https://alekarpy.uk/donate/",
   "action": {
     "default_title": "Fluent Notes",
     "default_popup": "popup.html",
